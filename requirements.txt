@@ -1,0 +1,21 @@
+# Flask相关
+flask>=2.2.2
+werkzeug>=2.2.2
+
+# 深度学习相关
+torch>=1.13.0
+torchvision>=0.14.0
+tensorflow>=2.11.0
+keras-preprocessing>=1.1.2
+ultralytics>=8.0.20
+
+# 图像处理
+opencv-python>=4.7.0.72
+Pillow>=9.3.0
+
+# 数值计算
+numpy>=1.23.5
+pandas>=1.5.2
+
+# 其他实用库
+typing-extensions>=4.4.0

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 智能套牌车稽查系统</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            font-family: 'Noto Sans SC', sans-serif;
+            padding-bottom: 20vh; /* 将内容向上推，使其位于中间偏上 */
+            box-sizing: border-box; /* 确保padding正确计算 */
+        }
+        .login-card {
+            width: 100%;
+            max-width: 450px; /* 为横向表单增加宽度 */
+            padding: 2.5rem;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            background-color: white;
+            border-top: 4px solid #007bff;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem; /* 增加标题和表单的间距 */
+        }
+        .login-header h2 {
+            font-weight: 500;
+            font-size: 1.75rem;
+            color: #343a40;
+        }
+        .login-header p {
+            font-size: 0.95rem;
+            color: #0c0c0c;
+        }
+        .form-group {
+            margin-bottom: 1.5rem; /* 调整表单项间距 */
+            display: flex; /* 使用flex布局实现水平对齐 */
+            align-items: center; /* 垂直居中对齐标签和输入框 */
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #495057;
+            width: 70px; /* 固定标签宽度 */
+            text-align: right; /* 标签文本右对齐 */
+            margin-right: 1rem; /* 标签和输入框的间距 */
+            flex-shrink: 0; /* 防止标签在空间不足时被压缩 */
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            font-size: 1rem;
+            height: auto;
+            flex-grow: 1; /* 让输入框占据剩余空间 */
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            border-color: #80bdff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 8px;
+            padding: 0.7rem;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <h2>稽查系统 • 安全登录</h2>
+            <p>请输入您的凭据以访问系统</p>
+        </div>
+        <form action="{{ url_for('login') }}" method="post" class="mt-4">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密　码</label> <!-- 使用全角空格对齐 -->
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            {% if error %}
+                <div class="alert alert-danger mt-3">{{ error }}</div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary btn-block mt-4">安全登录</button>
+        </form>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 智能套牌车稽查系统. All Rights Reserved.</p>
+    </div>
+</body>
+</html> 

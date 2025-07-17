@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .wrapper { display: flex; width: 100%; min-height: 100vh; }
+    .sidebar { width: 260px; background: #2c3e50; color: white; position: fixed; height: 100%; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+    .sidebar .sidebar-header { padding: 20px; background: #1a252f; text-align: center; }
+    .sidebar .sidebar-header h3 { margin: 0; font-weight: 600; }
+    .sidebar ul.components { padding: 20px 0; border-bottom: 1px solid #475a6a; }
+    .sidebar ul p { color: white; padding: 10px; font-size: 1.1em; display: block; }
+    .sidebar ul li a { padding: 15px 20px; font-size: 1.1em; display: block; color: #ced4da; border-left: 3px solid transparent; }
+    .sidebar ul li a:hover { color: #ffffff; background: #34495e; border-left-color: #3498db; text-decoration: none; }
+    .sidebar ul li.active > a { background: #34495e; color: #ffffff; border-left-color: #3498db; }
+    .main-panel { margin-left: 260px; width: calc(100% - 260px); padding: 20px; }
+    .navbar { padding: 15px 10px; background: #fff; border: none; border-radius: 0; margin-bottom: 40px; box-shadow: 1px 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: flex-end; }
+    .card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); padding: 2rem; border: 1px solid #e9ecef; }
+    
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .history-item {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .history-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    .history-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .history-item .info {
+        padding: 1rem;
+        background-color: #f8f9fa;
+    }
+    .history-item .info p {
+        margin: 0;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="wrapper">
+    <!-- 侧边栏 -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>稽查系统</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <p>主菜单</p>
+            <li>
+                <a href="{{ url_for('analyze') }}">实时分析</a>
+            </li>
+            <li>
+                <a href="{{ url_for('check_status') }}">系统状态</a>
+            </li>
+            <li class="active">
+                <a href="{{ url_for('history') }}">历史记录</a>
+            </li>
+            <li>
+                <a href="{{ url_for('export_page') }}">结果导出</a>
+            </li>
+            <li>
+                <a href="{{ url_for('support') }}">技术支持</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 主内容面板 -->
+    <div class="main-panel">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar">
+             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">退出登录</a>
+        </nav>
+
+        <div class="card">
+            <h4>检测历史记录</h4>
+            <hr>
+        
+            <!-- 套牌车记录 -->
+            <h5 style="color: red;">⚠️ 套牌车辆</h5>
+            {% if suspicious_vehicles %}
+                <div class="history-grid">
+                    {% for item in suspicious_vehicles %}
+                        <div class="history-item">
+                            <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="套牌车辆图像">
+                            <div class="info">
+                                {% if item.data %}
+                                    <p title="{{ item.data.plate }}">车牌: {{ item.data.plate }}</p>
+                                    <p>品牌: {{ item.data.brand }}</p>
+                                    <p>颜色: {{ item.data.color }}</p>
+                                    <p>安全带: {{ item.data.belt or '未知' }}</p>
+                                {% else %}
+                                    <p>车牌: 未知</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">暂无套牌车辆记录。</p>
+            {% endif %}
+        
+            <!-- 普通车辆记录 -->
+            <br><h5>✅ 普通车辆</h5>
+            {% if normal_vehicles %}
+                <div class="history-grid">
+                    {% for item in normal_vehicles %}
+                        <div class="history-item">
+                            <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="普通车辆图像">
+                            <div class="info">
+                                {% if item.data %}
+                                    <p title="{{ item.data.plate }}">车牌: {{ item.data.plate }}</p>
+                                    <p>品牌: {{ item.data.brand }}</p>
+                                    <p>颜色: {{ item.data.color }}</p>
+                                    <p>安全带: {{ item.data.belt or '未知' }}</p>
+                                {% else %}
+                                    <p>车牌: 未知</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">暂无普通车辆记录。</p>
+            {% endif %}
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="text-center mt-4 py-3">
+            <p class="text-white">&copy; 2025 智能交通安全管理中心. All Rights Reserved.</p>
+        </footer>
+    </div>
+</div>
+{% endblock %} 

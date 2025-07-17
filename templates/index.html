@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .wrapper {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    /* 侧边栏导航 */
+    .sidebar {
+        width: 260px;
+        background: #2c3e50;
+        color: white;
+        position: fixed;
+        height: 100%;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    .sidebar .sidebar-header {
+        padding: 20px;
+        background: #1a252f;
+        text-align: center;
+    }
+    .sidebar .sidebar-header h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .sidebar ul.components {
+        padding: 20px 0;
+        border-bottom: 1px solid #475a6a;
+    }
+    .sidebar ul p {
+        color: white;
+        padding: 10px;
+        font-size: 1.1em;
+        display: block;
+    }
+    .sidebar ul li a {
+        padding: 15px 20px;
+        font-size: 1.1em;
+        display: block;
+        color: #ced4da;
+        border-left: 3px solid transparent;
+    }
+    .sidebar ul li a:hover {
+        color: #ffffff;
+        background: #34495e;
+        border-left-color: #3498db;
+        text-decoration: none;
+    }
+    .sidebar ul li.active > a {
+        background: #34495e;
+        color: #ffffff;
+        border-left-color: #3498db;
+    }
+    
+    /* 主内容区 */
+    .main-panel {
+        margin-left: 260px; /* 与sidebar宽度一致 */
+        width: calc(100% - 260px);
+        padding: 20px;
+    }
+
+    /* 顶部导航栏 */
+    .navbar {
+        padding: 15px 10px;
+        background: #fff;
+        border: none;
+        border-radius: 0;
+        margin-bottom: 40px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .upload-area {
+        border: 2px dashed #bdc3c7;
+        padding: 2rem;
+        text-align: center;
+        background: #ecf0f1;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .result-list { list-style-type: none; padding-left: 0; }
+    .result-list li { 
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #ecf0f1;
+        font-size: 1.1rem;
+    }
+    .result-list li:last-child { border-bottom: none; }
+</style>
+
+<div class="wrapper">
+    <!-- 侧边栏 -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>稽查系统</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <p>主菜单</p>
+            <li class="active">
+                <a href="{{ url_for('analyze') }}">实时分析</a>
+            </li>
+            <li>
+                <a href="{{ url_for('check_status') }}">系统状态</a>
+            </li>
+            <li>
+                <a href="{{ url_for('history') }}">历史记录</a>
+            </li>
+            <li>
+                <a href="{{ url_for('export_page') }}">结果导出</a>
+            </li>
+            <li>
+                <a href="{{ url_for('support') }}">技术支持</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 主内容面板 -->
+    <div class="main-panel">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar">
+             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">退出登录</a>
+        </nav>
+
+        <!-- 内容行 -->
+        <div class="row align-items-stretch">
+            <!-- 左侧上传面板 -->
+            <div class="col-md-5">
+                <div class="card">
+                    <h4>上传车辆图片</h4>
+                    <hr>
+                    <form id="uploadForm" action="/" enctype="multipart/form-data" method="post">
+                        <div class="upload-area">
+                            <p>点击或拖拽文件到此区域</p>
+                            <input type="file" name="file" style="display: none;">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">开始分析</button>
+                    </form>
+                </div>
+                <div class="mb-3 text-center">
+                    <p class="text-white">
+                        <strong>请上传道路卡口抓拍照片</strong>,确保图中有完整的车辆正面图像
+                    </p>
+                    <div>
+                        <img src="{{ url_for('static', filename='../static/images/index01.jpg') }}" 
+                             alt="卡口照片示例" 
+                             class="img-thumbnail" 
+                             style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+                        <small class="d-block text-muted mt-1">示例：卡口抓拍车辆图像</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧结果面板 -->
+            <div class="col-md-7 d-flex flex-column">
+                <div class="card flex-grow-1 d-flex flex-column">
+                    <h4>分析结果</h4>
+                    <hr>
+                    {% if context %}
+                        <div class="row">
+                            <div class="col-lg-6 d-flex flex-column align-items-center">
+                                <img src="{{ url_for('static', filename=uploaded_image, _t=val1) }}" alt="分析结果" class="img-fluid rounded">
+                                <a href="{{ url_for('static', filename=uploaded_image) }}" download class="btn btn-outline-secondary mt-2">下载结果图</a>
+                            </div>
+                            <div class="col-lg-6">
+                                <ul class="result-list mt-3 mt-lg-0">
+                                {% for value in context %}
+                                    {% set color_class = 'text-muted' %}
+                                    {% if '正常' in value %}
+                                        {% set color_class = 'text-success' %}
+                                    {% elif '套牌' in value or '未佩戴' in value %}
+                                        {% set color_class = 'text-danger' %}
+                                    {% elif '未识别' in value or '不确定' in value %}
+                                        {% set color_class = 'text-warning' %}
+                                    {% endif %}
+                                    <li class="{{ color_class }}">{{ value }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">请上传图片以查看分析结果。</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="text-center mt-4 py-3">
+            <p class="text-white">&copy; 2025 智能交通安全管理中心. All Rights Reserved.</p>
+        </footer>
+    </div>
+</div>
+
+<script>
+// 简单的拖拽上传交互
+const uploadArea = document.querySelector('.upload-area');
+const fileInput = uploadArea.querySelector('input[type="file"]');
+const uploadForm = document.getElementById('uploadForm');
+
+uploadArea.addEventListener('click', () => fileInput.click());
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.style.backgroundColor = '#dde4e9';
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.style.backgroundColor = '#ecf0f1';
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.style.backgroundColor = '#ecf0f1';
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        uploadArea.querySelector('p').textContent = e.dataTransfer.files[0].name;
+    }
+});
+
+// 文件选择后更新文本
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        uploadArea.querySelector('p').textContent = fileInput.files[0].name;
+    }
+});
+
+// 表单提交时验证
+uploadForm.addEventListener('submit', function(e) {
+    if (fileInput.files.length === 0) {
+        e.preventDefault(); // 阻止表单提交
+        alert('请选择要上传的图片文件。');
+    }
+});
+</script>
+
+{% endblock %}
